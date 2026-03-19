@@ -14,17 +14,29 @@ from components.plant import *
 def main():
 
     # Define the file paths
+    # file_paths = {
+    #     'state_shapefile': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/cb_2022_us_state_20m/cb_2022_us_state_20m.shp',
+    #     'county_csv': 'CountyMaps/county_data.csv',
+    #     'supply_data': '/Users/maria/Documents/Research/deloitte-proj/telecom-data/supply_data_lat_lon_water_clim.csv',
+    #     'merged_cf': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/merged_hourly_solar_wind_cf.csv',
+    #     'demand_data': 'fake_demand.csv',
+    #     'county2zone': 'CountyMaps/county2zone.csv',
+    #     'hierarchy': 'CountyMaps/hierarchy.csv',
+    #     'electric_prices': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/electric_prices.csv',
+    #     'water_risk': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/water_risk.gpkg',
+    #     'county_shapefile': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/cb_2018_us_county_5m/cb_2018_us_county_5m.shp'
+    # }
     file_paths = {
-        'state_shapefile': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/cb_2022_us_state_20m/cb_2022_us_state_20m.shp',
+        'state_shapefile': 'Data/cb_2022_us_state20m/cb_2022_us_state_20m.shp',
         'county_csv': 'CountyMaps/county_data.csv',
-        'supply_data': '/Users/maria/Documents/Research/deloitte-proj/telecom-data/supply_data_lat_lon_water_clim.csv',
-        'merged_cf': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/merged_hourly_solar_wind_cf.csv',
+        'supply_data': 'Data/supply_data_lat_lon_water_clim4.csv',
+        'merged_cf': 'Data/merged_hourly_solar_wind_cf.csv',
         'demand_data': 'fake_demand.csv',
         'county2zone': 'CountyMaps/county2zone.csv',
         'hierarchy': 'CountyMaps/hierarchy.csv',
-        'electric_prices': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/electric_prices.csv',
-        'water_risk': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/water_risk.gpkg',
-        'county_shapefile': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/cb_2018_us_county_5m/cb_2018_us_county_5m.shp'
+        'electric_prices': 'Data/electric_prices.csv',
+        'water_risk': 'Data/water_risk.gpkg',
+        'county_shapefile': 'Data/cb_2018_us_county_5m/cb_2018_us_county_5m.shp'
     }
 
     # Process the data
@@ -37,7 +49,8 @@ def main():
         telecom_cost_dict=telecom_cost,
         min_capacity=200,        # Minimum total renewable capacity (MW)
         state_filter=None,       # Set to specific state if desired (e.g., 'TX' for Texas)
-        max_water_risk=5.0       # Maximum acceptable water risk
+        max_water_risk=None
+        # max_water_risk=5.0       # Maximum acceptable water risk
     )
 
     # Apply load multiplier to energy and water loads

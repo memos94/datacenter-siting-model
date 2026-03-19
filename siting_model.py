@@ -714,7 +714,80 @@ class SitingModel:
         
         print("Model build complete!")
         print(f"Storage system: {self.storage.storage_type}")
+        
+    # def solve(self, solver_name: str = 'cbc', **solver_options) -> Dict:
+    #     """
+    #     Solve the optimization model.
+        
+    #     Args:
+    #         solver_name: Name of the solver to use
+    #         **solver_options: Additional solver options
+            
+    #     Returns:
+    #         Dictionary with solution results
+    #     """
+    #     print(f"Solving model with {solver_name}...")
+        
+    #     # Check solver availability
+    #     if not SolverFactory(solver_name).available():
+    #         raise ValueError(f"Solver {solver_name} is not available")
+            
+    #     solver = SolverFactory(solver_name)
+        
+    #     # Set solver options
+    #     # 2. cbc
+    #     if solver_name == 'cbc':
+    #         # 'ratio' es el equivalente al 'mipgap' (0.05 = 5% de margen de error)
+    #         solver.options['ratio'] = solver_options.get('mipgap', 0.05)
+    #         # 'sec' es el tiempo máximo en segundos antes de detenerse
+    #         solver.options['sec'] = solver_options.get('timeout', 600)
+    #         # 'threads' para usar múltiples núcleos de tu CPU
+    #         solver.options['threads'] = 4
+    #     else:
+    #         # Mantener compatibilidad con otros solvers
+    #         for option, val in solver_options.items():
+    #             solver.options[option] = val
+            
+    #     # Solve the model
+    #     self.results = solver.solve(self.model, tee=True)
 
+    #     # Check solution status
+    #     termination = self.results.solver.termination_condition
+        
+    #     if termination == pyo.TerminationCondition.infeasibleOrUnbounded:
+    #         print("\n" + "="*60)
+    #         print("MODEL IS INFEASIBLE OR UNBOUNDED")
+    #         print("="*60)
+    #         self.diagnose_infeasibility()
+    #         raise ValueError("Model is infeasible or unbounded. See diagnostics above.")
+        
+    #     if termination == pyo.TerminationCondition.infeasible:
+    #         print("\n" + "="*60)
+    #         print("MODEL IS INFEASIBLE")
+    #         print("="*60)
+    #         self.diagnose_infeasibility()
+    #         raise ValueError("Model is infeasible. See diagnostics above.")
+        
+    #     if termination != pyo.TerminationCondition.optimal:
+    #         print(f"\nWARNING: Solver terminated with condition: {termination}")
+
+    #     if termination in [pyo.TerminationCondition.infeasible, 
+    #                    pyo.TerminationCondition.infeasibleOrUnbounded]:
+    #         print("\n" + "="*60)
+    #         print("MODEL IS INFEASIBLE")
+    #         print("="*60)
+            
+    #         # Use Pyomo's infeasibility logger
+    #         from pyomo.util.infeasible import log_infeasible_constraints
+    #         log_infeasible_constraints(self.model, log_expression=True, log_variables=True)
+            
+    #         self.diagnose_infeasibility()
+    #         raise ValueError("Model is infeasible. See diagnostics above.")
+        
+    #     # Extract solution
+    #     solution = self.extract_solution()
+        
+    #     return solution
     def solve(self, solver_name: str = 'gurobi', **solver_options) -> Dict:
         """
         Solve the optimization model.

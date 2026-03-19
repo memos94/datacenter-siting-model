@@ -1,0 +1,6 @@
+Data/
+cbc.exe
+gurobi110.lcr
+gurobi110.lcr.bak
+texas_script.py
+__pycache__
