@@ -1,0 +1,12 @@
+ba,nercr,transreg,transgrp,cendiv,st,interconnect,st_interconnect,country,usda_region,h2ptcreg,hurdlereg,aggreg
+p48,SPP,SPP,SPP_South,West_South_Central,TX,eastern,TX_eastern,USA,southern-plains,Texas,SPP,p48
+p57,SPP,SPP,SPP_South,West_South_Central,TX,eastern,TX_eastern,USA,southern-plains,Texas,SPP,p57
+p59,WECC_SW,WestConnect,WestConnect_South,Mountain,TX,western,TX_western,USA,southern-plains,Texas,El_Paso_Electric,p59
+p60,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p60
+p61,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p61
+p62,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p62
+p63,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p63
+p64,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p64
+p65,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p65
+p66,MISO,MISO,MISO_South,West_South_Central,TX,eastern,TX_eastern,USA,southern-plains,Texas,MISO,p66
+p67,ERCOT,ERCOT,ERCOT,West_South_Central,TX,ercot,TX_ercot,USA,southern-plains,Texas,ERCOT,p67

@@ -147,9 +147,9 @@ class OptimizationConfig:
     project_lifetime: float = 5 # 20 for main results
     
     # Solver parameters
-    solver_name: str = 'gurobi'
+    solver_name: str = 'scip'
     solver_time_limit: float = 1000.0  # seconds
-    solver_mip_gap: float = 0.01       # 1%
+    solver_mip_gap: float = 0.03       # 1%
 
     # Cost component toggles
     include_transmission_cost: bool = True

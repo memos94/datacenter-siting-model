@@ -715,80 +715,8 @@ class SitingModel:
         print("Model build complete!")
         print(f"Storage system: {self.storage.storage_type}")
         
-    # def solve(self, solver_name: str = 'cbc', **solver_options) -> Dict:
-    #     """
-    #     Solve the optimization model.
-        
-    #     Args:
-    #         solver_name: Name of the solver to use
-    #         **solver_options: Additional solver options
-            
-    #     Returns:
-    #         Dictionary with solution results
-    #     """
-    #     print(f"Solving model with {solver_name}...")
-        
-    #     # Check solver availability
-    #     if not SolverFactory(solver_name).available():
-    #         raise ValueError(f"Solver {solver_name} is not available")
-            
-    #     solver = SolverFactory(solver_name)
-        
-    #     # Set solver options
-    #     # 2. cbc
-    #     if solver_name == 'cbc':
-    #         # 'ratio' es el equivalente al 'mipgap' (0.05 = 5% de margen de error)
-    #         solver.options['ratio'] = solver_options.get('mipgap', 0.05)
-    #         # 'sec' es el tiempo máximo en segundos antes de detenerse
-    #         solver.options['sec'] = solver_options.get('timeout', 600)
-    #         # 'threads' para usar múltiples núcleos de tu CPU
-    #         solver.options['threads'] = 4
-    #     else:
-    #         # Mantener compatibilidad con otros solvers
-    #         for option, val in solver_options.items():
-    #             solver.options[option] = val
-            
-    #     # Solve the model
-    #     self.results = solver.solve(self.model, tee=True)
-
-    #     # Check solution status
-    #     termination = self.results.solver.termination_condition
-        
-    #     if termination == pyo.TerminationCondition.infeasibleOrUnbounded:
-    #         print("\n" + "="*60)
-    #         print("MODEL IS INFEASIBLE OR UNBOUNDED")
-    #         print("="*60)
-    #         self.diagnose_infeasibility()
-    #         raise ValueError("Model is infeasible or unbounded. See diagnostics above.")
-        
-    #     if termination == pyo.TerminationCondition.infeasible:
-    #         print("\n" + "="*60)
-    #         print("MODEL IS INFEASIBLE")
-    #         print("="*60)
-    #         self.diagnose_infeasibility()
-    #         raise ValueError("Model is infeasible. See diagnostics above.")
-        
-    #     if termination != pyo.TerminationCondition.optimal:
-    #         print(f"\nWARNING: Solver terminated with condition: {termination}")
-
-    #     if termination in [pyo.TerminationCondition.infeasible, 
-    #                    pyo.TerminationCondition.infeasibleOrUnbounded]:
-    #         print("\n" + "="*60)
-    #         print("MODEL IS INFEASIBLE")
-    #         print("="*60)
-            
-    #         # Use Pyomo's infeasibility logger
-    #         from pyomo.util.infeasible import log_infeasible_constraints
-    #         log_infeasible_constraints(self.model, log_expression=True, log_variables=True)
-            
-    #         self.diagnose_infeasibility()
-    #         raise ValueError("Model is infeasible. See diagnostics above.")
-        
-    #     # Extract solution
-    #     solution = self.extract_solution()
-        
     #     return solution
-    def solve(self, solver_name: str = 'gurobi', **solver_options) -> Dict:
+    def solve(self, solver_name: str = 'scip', **solver_options) -> Dict:
         """
         Solve the optimization model.
         
@@ -806,7 +734,15 @@ class SitingModel:
             raise ValueError(f"Solver {solver_name} is not available")
             
         solver = SolverFactory(solver_name)
-        
+        if solver_name == 'scip':
+            # Configuración específica para SCIP
+            if 'TimeLimit' in solver_options:
+                solver.options['limits/time'] = solver_options['TimeLimit']
+            if 'MIPGap' in solver_options:
+                solver.options['limits/gap'] = solver_options['MIPGap']
+        elif solver_name == 'gurobi':
+            solver.options['TimeLimit'] = solver_options.get('TimeLimit', 1000)
+            solver.options['MIPGap'] = solver_options.get('MIPGap', 0.01)
         # Set solver options
         for option, val in solver_options.items():
             solver.options[option] = val
@@ -1031,7 +967,7 @@ def run_datacenter_optimization(model_dictionaries: Dict,
                             cost_params: Dict,
                             trans_rating: Dict,
                             trans_cost: Dict,
-                            solver_name: str = 'gurobi',
+                            solver_name: str = 'scip',
                             processor = None,
                             storage_system: Optional[Storage] = None,
                             plant_systems: Optional[Plant] = None,
@@ -1095,6 +1031,34 @@ if __name__ == "__main__":
         max_water_risk=5.0,
         county_filter = None
     )
+    # --- BLOQUE PARA EXPORTAR DATOS ---
+    import pandas as pd
+    import os
+
+    print("Exportando diccionarios de entrada para revisión...")
+    output_dir = "debug_data"
+    os.makedirs(output_dir, exist_ok=True)
+
+    for name, data_dict in model_dictionaries.items():
+        if not data_dict: continue
+        
+        # Intentamos crear un DataFrame. 
+        # Si la clave es una tupla (hora, loc), Pandas creará un MultiIndex automáticamente.
+        df = pd.Series(data_dict).reset_index()
+        
+        # Nombrar columnas según el tipo de índice
+        if len(df.columns) == 3:
+            df.columns = ['hour', 'location', 'value']
+        else:
+            df.columns = ['location', 'value']
+            
+        df.to_csv(f"{output_dir}/{name}.csv", index=False)
+
+    print(f"Archivos exportados en la carpeta '{output_dir}/'")
+    # Exportar el DataFrame maestro antes de que se convierta en diccionarios
+    processor.processed_data['supply_data'].to_csv("debug_supply_full.csv")
+    processor.processed_data['merged_gen'].to_csv("debug_generation_hourly.csv")
+    # ----------------------------------
 
     # 5. Run the optimization
     opt_model, solution = run_datacenter_optimization(
@@ -1103,7 +1067,7 @@ if __name__ == "__main__":
         cost_params=cost_params,
         trans_rating = trans_rating,
         trans_cost = trans_cost,
-        solver_name='gurobi',
+        solver_name='scip',
         processor=processor,
         storage_system = StorageTemplates.create_lithium_ion("my_battery"),
         plant_systems = {

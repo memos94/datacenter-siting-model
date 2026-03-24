@@ -26,15 +26,28 @@ def main():
     #     'water_risk': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/water_risk.gpkg',
     #     'county_shapefile': '/Users/maria/Documents/Research/deloitte-proj/deloitte-data/cb_2018_us_county_5m/cb_2018_us_county_5m.shp'
     # }
+    # file_paths = {
+    #     'state_shapefile': 'Data/cb_2022_us_state20m/cb_2022_us_state_20m.shp',
+    #     'county_csv': 'CountyMaps/county_data.csv',
+    #     'supply_data': 'Data/supply_data_lat_lon_water_clim5.csv',
+    #     'merged_cf': 'Data/merged_hourly_solar_wind_cf.csv',
+    #     'demand_data': 'fake_demand.csv',
+    #     'county2zone': 'CountyMaps/county2zone.csv',
+    #     'hierarchy': 'CountyMaps/hierarchy.csv',
+    #     'electric_prices': 'Data/electric_prices.csv',
+    #     'water_risk': 'Data/water_risk.gpkg',
+    #     'county_shapefile': 'Data/cb_2018_us_county_5m/cb_2018_us_county_5m.shp'
+    # }
+
     file_paths = {
         'state_shapefile': 'Data/cb_2022_us_state20m/cb_2022_us_state_20m.shp',
-        'county_csv': 'CountyMaps/county_data.csv',
-        'supply_data': 'Data/supply_data_lat_lon_water_clim4.csv',
-        'merged_cf': 'Data/merged_hourly_solar_wind_cf.csv',
-        'demand_data': 'fake_demand.csv',
-        'county2zone': 'CountyMaps/county2zone.csv',
-        'hierarchy': 'CountyMaps/hierarchy.csv',
-        'electric_prices': 'Data/electric_prices.csv',
+        'county_csv': 'TexasData/texas_data/tx_county_data.csv',
+        'supply_data': 'TexasData/texas_data/tx_supply_Data.csv',
+        'merged_cf': 'TexasData/texas_data/tx_merged_cf.csv',
+        'demand_data': 'TexasData/texas_data/tx_demand.csv',
+        'county2zone': 'TexasData/texas_data/tx_county2zone.csv',
+        'hierarchy': 'TexasData/texas_data/tx_hierarchy.csv',
+        'electric_prices': 'TexasData/texas_data/tx_electric_prices.csv',
         'water_risk': 'Data/water_risk.gpkg',
         'county_shapefile': 'Data/cb_2018_us_county_5m/cb_2018_us_county_5m.shp'
     }
@@ -52,6 +65,32 @@ def main():
         max_water_risk=None
         # max_water_risk=5.0       # Maximum acceptable water risk
     )
+    import pandas as pd
+    import os
+
+    print("Exportando diccionarios de entrada para revisión...")
+    output_dir = "debug_data"
+    os.makedirs(output_dir, exist_ok=True)
+
+    for name, data_dict in model_dictionaries.items():
+        if not data_dict: continue
+        
+        # Intentamos crear un DataFrame. 
+        # Si la clave es una tupla (hora, loc), Pandas creará un MultiIndex automáticamente.
+        df = pd.Series(data_dict).reset_index()
+        
+        # Nombrar columnas según el tipo de índice
+        if len(df.columns) == 3:
+            df.columns = ['hour', 'location', 'value']
+        else:
+            df.columns = ['location', 'value']
+            
+        df.to_csv(f"{output_dir}/{name}.csv", index=False)
+
+    print(f"Archivos exportados en la carpeta '{output_dir}/'")
+    # Exportar el DataFrame maestro antes de que se convierta en diccionarios
+    processor.processed_data['supply_data'].to_csv("debug_supply_full.csv")
+    processor.processed_data['merged_gen'].to_csv("debug_generation_hourly.csv")
 
     # Apply load multiplier to energy and water loads
     if config['load_multiplier'] != 1.0:
@@ -80,7 +119,7 @@ def main():
             cost_params=cost_params,
             trans_rating = trans_rating,
             trans_cost = trans_cost,
-            solver_name='gurobi',
+            solver_name='scip',
             processor=processor,
             storage_system = StorageTemplates.create_lithium_ion("lithium-battery"),
             plant_systems = {'smr': PlantTemplates.create_smr_plant("my_smr", 1000),

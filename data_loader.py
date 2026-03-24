@@ -274,8 +274,8 @@ class DataForModel:
         geo_hourly_dict = geo_gen_df.set_index(['hour', 'location'])['geo_gen'].to_dict()
 
         # Energy and water loads  
-        pue_series = supply_data['clim_zone'].map(pue_climate_dict)
-        wue_series = supply_data['clim_zone'].map(wue_climate_dict)
+        pue_series = supply_data['clim_zone'].map(pue_climate_dict).fillna(1.2)
+        wue_series = supply_data['clim_zone'].map(wue_climate_dict).fillna(0.3)
         pue_dict = dict(zip(supply_data['location'], pue_series))  # (kWh/kWh)
         wue_dict = dict(zip(supply_data['location'], wue_series)) # (L/kWh)
 
